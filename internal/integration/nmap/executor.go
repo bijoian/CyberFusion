@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/bijoian/cyberfusion/internal/domain"
 )
 
 // Scan executes an nmap scan on the target

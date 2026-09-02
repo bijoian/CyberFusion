@@ -5,16 +5,19 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bijoian/cyberfusion/internal/authorization"
 	"github.com/bijoian/cyberfusion/internal/database"
+	"github.com/bijoian/cyberfusion/internal/domain"
 	"github.com/bijoian/cyberfusion/internal/orchestrator"
 	"github.com/spf13/cobra"
 )
 
 var (
-	targets  []string
-	modules  []string
-	timeout  int
-	threads  int
+	targets           []string
+	modules           []string
+	timeout           int
+	threads           int
+	authorizedTargets []string
 )
 
 var scanCmd = &cobra.Command{
@@ -33,12 +36,26 @@ func init() {
 	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run")
 	scanCmd.Flags().IntVar(&timeout, "timeout", 300, "Scan timeout in seconds")
 	scanCmd.Flags().IntVar(&threads, "threads", 10, "Number of parallel threads")
+	scanCmd.Flags().StringSliceVar(&authorizedTargets, "authorized-targets", nil, "Explicitly authorized targets or CIDR ranges")
 
 	scanCmd.MarkFlagRequired("targets")
+	scanCmd.MarkFlagRequired("authorized-targets")
 }
 
 func executeScan(cmd *cobra.Command, args []string) error {
 	log := getLogger()
+	authorizer, err := authorization.NewTargetAuthorizer(authorizedTargets)
+	if err != nil {
+		return fmt.Errorf("invalid authorized targets: %w", err)
+	}
+	normalizedTargets := make([]string, 0, len(targets))
+	for _, target := range targets {
+		normalizedTarget, err := authorizer.Authorize(target)
+		if err != nil {
+			return fmt.Errorf("target %q is not authorized: %w", target, err)
+		}
+		normalizedTargets = append(normalizedTargets, normalizedTarget)
+	}
 
 	// Connect to database
 	db, err := database.New(dbPath, log)
@@ -52,7 +69,7 @@ func executeScan(cmd *cobra.Command, args []string) error {
 
 	// Prepare scan config
 	config := orchestrator.ScanConfig{
-		Targets: targets,
+		Targets: normalizedTargets,
 		Modules: modules,
 		Timeout: time.Duration(timeout) * time.Second,
 		Threads: threads,
@@ -130,7 +147,7 @@ func printScanResults(result *orchestrator.ScanResult) {
 	fmt.Println("\n" + "="*50)
 }
 
-func countBySeverity(findings []orchestrator.Finding) (int, int, int, int, int) {
+func countBySeverity(findings []domain.Finding) (int, int, int, int, int) {
 	var critical, high, medium, low, info int
 	for _, finding := range findings {
 		switch finding.Severity {

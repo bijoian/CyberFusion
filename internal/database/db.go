@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/bijoian/cyberfusion/internal/domain"
@@ -72,6 +73,5 @@ func (d *Database) Ping() error {
 }
 
 func createDatabasePath(dbPath string) error {
-	// This is a placeholder - in production, use os.MkdirAll
-	return nil
+	return os.MkdirAll(dbPath, 0o750)
 }

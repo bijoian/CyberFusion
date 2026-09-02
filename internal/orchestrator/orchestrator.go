@@ -42,12 +42,19 @@ type ScanResult struct {
 
 // ExecuteScan runs a scan with the given configuration
 func (o *Orchestrator) ExecuteScan(ctx context.Context, config ScanConfig) (*ScanResult, error) {
+	return o.ExecuteScanFor(ctx, domain.NewScan(), config)
+}
+
+// ExecuteScanFor runs a scan using the supplied record. It allows callers that
+// create scan records before scheduling work to retain a stable scan ID.
+func (o *Orchestrator) ExecuteScanFor(ctx context.Context, scan *domain.Scan, config ScanConfig) (*ScanResult, error) {
 	if len(config.Targets) == 0 {
 		return nil, fmt.Errorf("no targets specified")
 	}
+	if scan == nil {
+		return nil, fmt.Errorf("scan record is required")
+	}
 
-	// Create scan record
-	scan := domain.NewScan()
 	scan.Targets = config.Targets
 	scan.Status = "running"
 	startTime := time.Now()
