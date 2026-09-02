@@ -86,11 +86,27 @@ go build -o cyberfusion ./cmd/cyberfusion
 
 # Debug mode
 ./cyberfusion scan --targets example.com --authorized-targets example.com --debug
+# Generate JSON and PDF exports in a chosen directory
+./cyberfusion scan --targets example.com --authorized-targets example.com --output-format json,pdf --output-dir ./reports
 ```
 
 Targets must be explicitly authorized with `--authorized-targets`. Hostnames and
 individual IP addresses must match exactly; CIDR allowlist entries can authorize
 individual IP addresses within that range.
+
+Each scan generates an HTML report in `reports/` by default. Select one or more
+formats with `--output-format` (`html`, `json`, or `pdf`). Files are named
+`cyberfusion-<scan-id>.<format>` and are created exclusively, so an existing
+report is never overwritten.
+
+### JSON Report Schema
+
+JSON exports use the versioned schema `cyberfusion.report/v1`. The top-level
+fields are `schema_version`, `scan`, `summary`, `assets`, and `findings`.
+`scan` contains identity, scope, timing, status, and metadata; `summary`
+contains risk and all severity counts; `assets` is the asset inventory; and
+each `findings` entry includes severity, CVE/CWE/CVSS data when available,
+evidence, sources, and remediation. Arrays are emitted as `[]` when empty.
 
 ### Control REST API
 
@@ -248,3 +264,7 @@ Built with inspiration from the Repertories :
 For issues and questions, please open a GitHub issue.
 
 ---
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/bijoian-report-generator
