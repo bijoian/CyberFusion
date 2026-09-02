@@ -9,4 +9,4 @@ services:
       - ./reports:/root/reports
     environment:
       - DB_PATH=/root/.cyberfusion
-    entrypoint: ./cyberfusion scan --targets example.com --debug
+    entrypoint: ./cyberfusion scan --targets example.com --authorized-targets example.com --debug

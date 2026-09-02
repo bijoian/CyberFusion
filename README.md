@@ -39,8 +39,10 @@ cyberfusion/
 │   ├── domain/              # Core models
 │   ├── database/            # Database layer (GORM)
 │   ├── orchestrator/        # Scan orchestration
+│   ├── api/                 # Versioned Control REST API
 │   └── integration/         # Scanner adapters
-│       └── nmap/            # Nmap integration ✅ (V0.1)
+│       ├── nmap/            # Nmap integration
+│       └── nuclei/          # Nuclei integration
 ├── Dockerfile               # Container image
 ├── docker-compose.yml       # Development environment
 └── README.md
@@ -53,6 +55,7 @@ cyberfusion/
 - Go 1.22+
 - Docker & Docker Compose
 - **nmap** (for port scanning)
+- **nuclei** (optional; required only with `--modules nuclei`)
 
 ### Installation
 
@@ -72,20 +75,64 @@ go build -o cyberfusion ./cmd/cyberfusion
 
 ```bash
 # Single target
-./cyberfusion scan --targets 192.168.1.1
+./cyberfusion scan --targets 192.168.1.1 --authorized-targets 192.168.1.1
 
 # Multiple targets
-./cyberfusion scan --targets 192.168.1.1,192.168.1.2,192.168.1.3
+./cyberfusion scan --targets 192.168.1.1,192.168.1.2,192.168.1.3 --authorized-targets 192.168.1.0/24
 
 # CIDR range
-./cyberfusion scan --targets 192.168.1.0/24
+./cyberfusion scan --targets 192.168.1.0/24 --authorized-targets 192.168.1.0/24
 
 # With specific ports
-./cyberfusion scan --targets example.com --options '{"ports": "22,80,443"}'
+./cyberfusion scan --targets example.com --authorized-targets example.com
 
 # Debug mode
-./cyberfusion scan --targets example.com --debug
+./cyberfusion scan --targets example.com --authorized-targets example.com --debug
+# Generate JSON and PDF exports in a chosen directory
+./cyberfusion scan --targets example.com --authorized-targets example.com --output-format json,pdf --output-dir ./reports
+
+# Nuclei vulnerability scan against an explicitly supplied target
+./cyberfusion scan --targets example.com --authorized-targets example.com --modules nuclei
 ```
+
+Targets must be explicitly authorized with `--authorized-targets`. Hostnames and
+individual IP addresses must match exactly; CIDR allowlist entries can authorize
+individual IP addresses within that range.
+
+Each scan generates an HTML report in `reports/` by default. Select one or more
+formats with `--output-format` (`html`, `json`, or `pdf`). Files are named
+`cyberfusion-<scan-id>.<format>` and are created exclusively, so an existing
+report is never overwritten.
+
+### JSON Report Schema
+
+JSON exports use the versioned schema `cyberfusion.report/v1`. The top-level
+fields are `schema_version`, `scan`, `summary`, `assets`, and `findings`.
+`scan` contains identity, scope, timing, status, and metadata; `summary`
+contains risk and all severity counts; `assets` is the asset inventory; and
+each `findings` entry includes severity, CVE/CWE/CVSS data when available,
+evidence, sources, and remediation. Arrays are emitted as `[]` when empty.
+
+### Control REST API
+
+Run the local Control API with an explicit scan allowlist:
+
+```bash
+./cyberfusion server --authorized-targets 192.168.1.0/24
+```
+
+The server listens on `127.0.0.1:8080` by default (`--listen-address` changes
+this). Available versioned endpoints are:
+
+- `GET /api/v1/health`
+- `GET, POST /api/v1/scans`
+- `GET /api/v1/scans/{id}`
+- `GET /api/v1/findings` and `GET /api/v1/findings/{id}`
+- `GET /api/v1/assets` and `GET /api/v1/assets/{id}`
+
+Collection endpoints support `limit` (1-100) and `offset`; findings can be
+filtered by `scan_id`, `asset_id`, `severity`, and `status`, while assets can be
+filtered by `scan_id`, `hostname`, `ip_address`, and `active`.
 
 ### Docker
 
@@ -94,7 +141,7 @@ go build -o cyberfusion ./cmd/cyberfusion
 docker build -t cyberfusion .
 
 # Run scan
-docker run --rm cyberfusion scan --targets 192.168.1.1
+docker run --rm cyberfusion scan --targets 192.168.1.1 --authorized-targets 192.168.1.1
 ```
 
 ## 📋 Features (V0.1)
@@ -115,7 +162,7 @@ docker run --rm cyberfusion scan --targets 192.168.1.1
 ### 🔄 In Progress
 - Nuclei integration
 - Full CVE database
-- API REST endpoints
+- Control REST API foundation
 
 ## 📊 Example Output
 
@@ -222,5 +269,10 @@ Built with inspiration from the Repertories :
 For issues and questions, please open a GitHub issue.
 
 ---
+<<<<<<< HEAD
+=======
 
-
+<<<<<<< HEAD
+>>>>>>> origin/bijoian-report-generator
+=======
+>>>>>>> origin/bijoian-nuclei-integration
