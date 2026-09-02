@@ -41,7 +41,8 @@ cyberfusion/
 │   ├── orchestrator/        # Scan orchestration
 │   ├── api/                 # Versioned Control REST API
 │   └── integration/         # Scanner adapters
-│       └── nmap/            # Nmap integration ✅ (V0.1)
+│       ├── nmap/            # Nmap integration
+│       └── nuclei/          # Nuclei integration
 ├── Dockerfile               # Container image
 ├── docker-compose.yml       # Development environment
 └── README.md
@@ -54,6 +55,7 @@ cyberfusion/
 - Go 1.22+
 - Docker & Docker Compose
 - **nmap** (for port scanning)
+- **nuclei** (optional; required only with `--modules nuclei`)
 
 ### Installation
 
@@ -88,6 +90,9 @@ go build -o cyberfusion ./cmd/cyberfusion
 ./cyberfusion scan --targets example.com --authorized-targets example.com --debug
 # Generate JSON and PDF exports in a chosen directory
 ./cyberfusion scan --targets example.com --authorized-targets example.com --output-format json,pdf --output-dir ./reports
+
+# Nuclei vulnerability scan against an explicitly supplied target
+./cyberfusion scan --targets example.com --authorized-targets example.com --modules nuclei
 ```
 
 Targets must be explicitly authorized with `--authorized-targets`. Hostnames and
@@ -267,4 +272,7 @@ For issues and questions, please open a GitHub issue.
 <<<<<<< HEAD
 =======
 
+<<<<<<< HEAD
 >>>>>>> origin/bijoian-report-generator
+=======
+>>>>>>> origin/bijoian-nuclei-integration

@@ -14,15 +14,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	targets           []string
-	modules           []string
-	timeout           int
-	threads           int
-	authorizedTargets []string
-	reportFormats   []string
-	reportOutputDir string
-)
+	var (
+		targets           []string
+		modules           []string
+		timeout           int
+		threads           int
+		authorizedTargets []string
+		reportFormats   []string
+		reportOutputDir string
+	)
 
 var scanCmd = &cobra.Command{
 	Use:   "scan",
@@ -37,7 +37,7 @@ func init() {
 	rootCmd.AddCommand(scanCmd)
 
 	scanCmd.Flags().StringSliceVarP(&targets, "targets", "t", []string{}, "Targets to scan (IP, domain, CIDR)")
-	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run")
+	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run (use nuclei for Nuclei vulnerability scanning)")
 	scanCmd.Flags().IntVar(&timeout, "timeout", 300, "Scan timeout in seconds")
 	scanCmd.Flags().IntVar(&threads, "threads", 10, "Number of parallel threads")
 	scanCmd.Flags().StringSliceVar(&authorizedTargets, "authorized-targets", nil, "Explicitly authorized targets or CIDR ranges")
@@ -49,6 +49,7 @@ func init() {
 }
 
 func executeScan(cmd *cobra.Command, args []string) error {
+	_ = args
 	log := getLogger()
 	authorizer, err := authorization.NewTargetAuthorizer(authorizedTargets)
 	if err != nil {

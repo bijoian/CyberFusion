@@ -3,23 +3,28 @@ package orchestrator
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/bijoian/cyberfusion/internal/domain"
+	"github.com/bijoian/cyberfusion/internal/integration"
+	"github.com/bijoian/cyberfusion/internal/integration/nuclei"
 	"github.com/sirupsen/logrus"
 )
 
 // Orchestrator manages the scan workflow
 type Orchestrator struct {
-	log *logrus.Logger
+	log      *logrus.Logger
+	registry *integration.Registry
 }
 
 // New creates a new orchestrator
 func New(log *logrus.Logger) *Orchestrator {
-	return &Orchestrator{
-		log: log,
-	}
+	registry := integration.NewRegistry()
+	registry.Register(nuclei.New(log))
+
+	return &Orchestrator{log: log, registry: registry}
 }
 
 // ScanConfig holds scan configuration
@@ -99,6 +104,8 @@ func (o *Orchestrator) ExecuteScanFor(ctx context.Context, scan *domain.Scan, co
 
 	wg.Wait()
 
+	var vulnerabilityErr error
+
 	// Phase 3: Vulnerability Scanning
 	wg.Add(1)
 	go func() {
@@ -107,6 +114,7 @@ func (o *Orchestrator) ExecuteScanFor(ctx context.Context, scan *domain.Scan, co
 		findings, err := o.runVulnerabilityScans(ctx, config)
 		if err != nil {
 			o.log.Errorf("[%s] Vulnerability scanning failed: %v", scan.ID, err)
+			vulnerabilityErr = err
 			return
 		}
 		mu.Lock()
@@ -115,6 +123,10 @@ func (o *Orchestrator) ExecuteScanFor(ctx context.Context, scan *domain.Scan, co
 	}()
 
 	wg.Wait()
+	if vulnerabilityErr != nil {
+		scan.Status = "failed"
+		return nil, fmt.Errorf("vulnerability scanning failed: %w", vulnerabilityErr)
+	}
 
 	// Phase 4: Correlation
 	o.log.Infof("[%s] Phase 4: Correlation", scan.ID)
@@ -149,8 +161,38 @@ func (o *Orchestrator) runDiscovery(ctx context.Context, config ScanConfig) ([]d
 }
 
 func (o *Orchestrator) runVulnerabilityScans(ctx context.Context, config ScanConfig) ([]domain.Finding, error) {
-	// Placeholder for vulnerability scanning logic
-	return []domain.Finding{}, nil
+	if !moduleEnabled(config.Modules, nuclei.AdapterName) {
+		return []domain.Finding{}, nil
+	}
+
+	scanner, ok := o.registry.Get(nuclei.AdapterName)
+	if !ok {
+		return nil, fmt.Errorf("scanner %q is not registered", nuclei.AdapterName)
+	}
+
+	findings := make([]domain.Finding, 0)
+	for _, target := range config.Targets {
+		if err := ctx.Err(); err != nil {
+			return nil, fmt.Errorf("nuclei scan canceled: %w", err)
+		}
+
+		targetFindings, err := scanner.Scan(ctx, target, nil)
+		if err != nil {
+			return nil, fmt.Errorf("nuclei scan for %q failed: %w", target, err)
+		}
+		findings = append(findings, targetFindings...)
+	}
+
+	return findings, nil
+}
+
+func moduleEnabled(modules []string, name string) bool {
+	for _, module := range modules {
+		if strings.EqualFold(strings.TrimSpace(module), name) {
+			return true
+		}
+	}
+	return false
 }
 
 func (o *Orchestrator) correlateFindings(result *ScanResult) {
