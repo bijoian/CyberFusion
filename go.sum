@@ -1,0 +1,12 @@
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1pFd3You0mk3VCmw=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpYYo/0iNvBByXysBccE=
+github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtQhXYUtlrIPZeIqsPQ=
+github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBkSomvzPiE5EzondkSPC7M=
+github.com/spf13/cobra v1.8.1 h1:e5/vxKd/rZsfSJMUX1agtjeTDf+prNO/QYyneHeUQ4=
+github.com/spf13/cobra v1.8.1/go.mod h1:wHxEcudfqmLlsXAu+75val+qiFTs270pDwwsSMWHDw=
+github.com/spf13/viper v1.19.0 h1:RWq5SEjt8o25SROyN3z7BPtF73rW92OGs/bNOMJkfsY=
+github.com/spf13/viper v1.19.0/go.mod h1:GQUN38dwxJ07y7t7e8hF1xHa0c16oXoRE2yQ5h5eBQ=
+gorm.io/driver/sqlite v1.5.6 h1:11VVGmJQ7P+UoeFpE1lKiKP9N7hUKryVtixfuvpAOo=
+gorm.io/driver/sqlite v1.5.6/go.mod h1:YvBHwUV64oGMSta81XFucXcIE93Z8ns74Z0MMaL4mE=
+gorm.io/gorm v1.25.12 h1:bJQrPzP8+Lo4v1nJ51uNY7kXXwZnrVOO2bIe6svzS4=
+gorm.io/gorm v1.25.12/go.mod h1:L4uxeKpfDE7Z3v3u60oL60t6UIDyWeBdVFUMt3/iFo=

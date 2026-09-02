@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  cyberfusion:
+    build: .
+    container_name: cyberfusion
+    volumes:
+      - .cyberfusion:/root/.cyberfusion
+      - ./reports:/root/reports
+    environment:
+      - DB_PATH=/root/.cyberfusion
+    entrypoint: ./cyberfusion scan --targets example.com --debug
