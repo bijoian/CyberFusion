@@ -99,7 +99,7 @@ func TestGenerateHandlesScanWithoutDiscoveries(t *testing.T) {
 	if err := json.Unmarshal(content, &exported); err != nil {
 		t.Fatalf("empty JSON report is invalid: %v", err)
 	}
-	for _, field := range []string{`"targets":[]`, `"assets":[]`, `"findings":[]`} {
+	for _, field := range []string{`"targets": []`, `"assets": []`, `"findings": []`} {
 		if !strings.Contains(string(content), field) {
 			t.Errorf("empty report JSON does not contain %s: %s", field, content)
 		}
