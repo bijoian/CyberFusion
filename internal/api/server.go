@@ -244,10 +244,10 @@ func (s *Server) createScan(w http.ResponseWriter, r *http.Request) {
 
 	executionScan := *scan
 	config := orchestrator.ScanConfig{
-		Targets:  normalizedTargets,
-		Modules:  request.Modules,
-		Timeout:  time.Duration(request.TimeoutSeconds) * time.Second,
-		Threads:  request.Threads,
+		Targets: normalizedTargets,
+		Modules: request.Modules,
+		Timeout: time.Duration(request.TimeoutSeconds) * time.Second,
+		Threads: request.Threads,
 	}
 	s.scanWG.Add(1)
 	go func() {
