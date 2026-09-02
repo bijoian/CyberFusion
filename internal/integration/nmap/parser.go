@@ -2,7 +2,6 @@ package nmap
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -12,11 +11,11 @@ import (
 
 // NmapResult represents parsed nmap output
 type NmapResult struct {
-	Host       string
-	Status     string
-	Ports      []NmapPort
-	OS         string
-	OSVersion  string
+	Host        string
+	Status      string
+	Ports       []NmapPort
+	OS          string
+	OSVersion   string
 	Fingerprint string
 }
 

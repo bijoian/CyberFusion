@@ -3,9 +3,10 @@ package nmap
 import (
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/bijoian/cyberfusion/internal/domain"
 )
 
 // Scan executes an nmap scan on the target
@@ -53,10 +54,10 @@ func (n *NmapAdapter) Scan(ctx context.Context, target string, options map[strin
 // buildNmapArgs constructs nmap command arguments
 func (n *NmapAdapter) buildNmapArgs(target string, options map[string]interface{}) []string {
 	args := []string{
-		"-sV",             // Service version detection
-		"-sC",             // Default scripts
-		"--open",          // Only show open ports
-		"-O",              // OS detection
+		"-sV",                   // Service version detection
+		"-sC",                   // Default scripts
+		"--open",                // Only show open ports
+		"-O",                    // OS detection
 		"--version-intensity=9", // High accuracy version detection
 	}
 

@@ -3,18 +3,20 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/bijoian/cyberfusion/internal/database"
+	"github.com/bijoian/cyberfusion/internal/domain"
 	"github.com/bijoian/cyberfusion/internal/orchestrator"
 	"github.com/spf13/cobra"
 )
 
 var (
-	targets  []string
-	modules  []string
-	timeout  int
-	threads  int
+	targets []string
+	modules []string
+	timeout int
+	threads int
 )
 
 var scanCmd = &cobra.Command{
@@ -22,7 +24,7 @@ var scanCmd = &cobra.Command{
 	Short: "Execute a security scan",
 	Long:  `Execute a comprehensive security scan on specified targets`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return executeScan(cmd)
+		return executeScan(cmd, args)
 	},
 }
 
@@ -30,7 +32,7 @@ func init() {
 	rootCmd.AddCommand(scanCmd)
 
 	scanCmd.Flags().StringSliceVarP(&targets, "targets", "t", []string{}, "Targets to scan (IP, domain, CIDR)")
-	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run")
+	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run (use nuclei for Nuclei vulnerability scanning)")
 	scanCmd.Flags().IntVar(&timeout, "timeout", 300, "Scan timeout in seconds")
 	scanCmd.Flags().IntVar(&threads, "threads", 10, "Number of parallel threads")
 
@@ -38,6 +40,7 @@ func init() {
 }
 
 func executeScan(cmd *cobra.Command, args []string) error {
+	_ = args
 	log := getLogger()
 
 	// Connect to database
@@ -48,7 +51,7 @@ func executeScan(cmd *cobra.Command, args []string) error {
 	defer db.Close()
 
 	// Create orchestrator
-	orchestrator := orchestrator.New(log)
+	scanOrchestrator := orchestrator.New(log)
 
 	// Prepare scan config
 	config := orchestrator.ScanConfig{
@@ -64,7 +67,7 @@ func executeScan(cmd *cobra.Command, args []string) error {
 
 	log.Infof("Starting scan on targets: %v", targets)
 
-	result, err := orchestrator.ExecuteScan(ctx, config)
+	result, err := scanOrchestrator.ExecuteScan(ctx, config)
 	if err != nil {
 		return fmt.Errorf("scan failed: %w", err)
 	}
@@ -95,9 +98,9 @@ func executeScan(cmd *cobra.Command, args []string) error {
 }
 
 func printScanResults(result *orchestrator.ScanResult) {
-	fmt.Println("\n" + "="*50)
+	fmt.Println("\n" + strings.Repeat("=", 50))
 	fmt.Println("CYBERFUSION")
-	fmt.Println("="*50)
+	fmt.Println(strings.Repeat("=", 50))
 	fmt.Printf("\nTarget: %v\n", result.Scan.Targets)
 	fmt.Printf("Scan ID: %s\n\n", result.Scan.ID)
 
@@ -110,9 +113,9 @@ func printScanResults(result *orchestrator.ScanResult) {
 	fmt.Println("[7] Correlation ............. DONE")
 	fmt.Println("[8] Risk Analysis ........... DONE")
 
-	fmt.Println("\n" + "-"*50)
+	fmt.Println("\n" + strings.Repeat("-", 50))
 	fmt.Println("RESULTS")
-	fmt.Println("-"*50)
+	fmt.Println(strings.Repeat("-", 50))
 
 	critical, high, medium, low, info := countBySeverity(result.Findings)
 
@@ -127,10 +130,10 @@ func printScanResults(result *orchestrator.ScanResult) {
 	fmt.Printf("Info               %d\n", info)
 	fmt.Printf("\nRisk Score: %d/100\n", result.Scan.RiskScore)
 	fmt.Printf("Duration: %d seconds\n", result.Scan.Duration)
-	fmt.Println("\n" + "="*50)
+	fmt.Println("\n" + strings.Repeat("=", 50))
 }
 
-func countBySeverity(findings []orchestrator.Finding) (int, int, int, int, int) {
+func countBySeverity(findings []domain.Finding) (int, int, int, int, int) {
 	var critical, high, medium, low, info int
 	for _, finding := range findings {
 		switch finding.Severity {

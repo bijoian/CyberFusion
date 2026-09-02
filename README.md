@@ -40,7 +40,8 @@ cyberfusion/
 │   ├── database/            # Database layer (GORM)
 │   ├── orchestrator/        # Scan orchestration
 │   └── integration/         # Scanner adapters
-│       └── nmap/            # Nmap integration ✅ (V0.1)
+│       ├── nmap/            # Nmap integration
+│       └── nuclei/          # Nuclei integration
 ├── Dockerfile               # Container image
 ├── docker-compose.yml       # Development environment
 └── README.md
@@ -53,6 +54,7 @@ cyberfusion/
 - Go 1.22+
 - Docker & Docker Compose
 - **nmap** (for port scanning)
+- **nuclei** (optional; required only with `--modules nuclei`)
 
 ### Installation
 
@@ -85,6 +87,9 @@ go build -o cyberfusion ./cmd/cyberfusion
 
 # Debug mode
 ./cyberfusion scan --targets example.com --debug
+
+# Nuclei vulnerability scan against an explicitly supplied target
+./cyberfusion scan --targets https://example.com --modules nuclei
 ```
 
 ### Docker
@@ -222,5 +227,4 @@ Built with inspiration from the Repertories :
 For issues and questions, please open a GitHub issue.
 
 ---
-
 
