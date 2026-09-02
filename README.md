@@ -212,7 +212,7 @@ Apache License 2.0 - See LICENSE file for details
 
 ## 🙏 Acknowledgments
 
-Built by integrating concepts from:
+Built with inspiration from the Repertories :
 - [OWASP Nettacker](https://github.com/OWASP/Nettacker)
 - [scan4all](https://github.com/GhostTroops/scan4all)
 - [RapidScan](https://github.com/skavngr/rapidscan)
