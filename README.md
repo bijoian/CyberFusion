@@ -269,10 +269,3 @@ Built with inspiration from the Repertories :
 For issues and questions, please open a GitHub issue.
 
 ---
-<<<<<<< HEAD
-=======
-
-<<<<<<< HEAD
->>>>>>> origin/bijoian-report-generator
-=======
->>>>>>> origin/bijoian-nuclei-integration
