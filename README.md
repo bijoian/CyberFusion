@@ -1,2 +1,3 @@
 # CyberFusion
-CyberFusion: Unified Security Scanning &amp; Intelligence Platform - Fusing Nettacker, scan4all, and RapidScan into a modular, scalable security framework
+CyberFusion: Unified Security Scanning &amp; Intelligence Platform - 
+It is a modular and scalable security structure.
