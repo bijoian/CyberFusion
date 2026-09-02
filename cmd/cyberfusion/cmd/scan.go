@@ -7,14 +7,17 @@ import (
 
 	"github.com/bijoian/cyberfusion/internal/database"
 	"github.com/bijoian/cyberfusion/internal/orchestrator"
+	"github.com/bijoian/cyberfusion/internal/report"
 	"github.com/spf13/cobra"
 )
 
 var (
-	targets  []string
-	modules  []string
-	timeout  int
-	threads  int
+	targets         []string
+	modules         []string
+	timeout         int
+	threads         int
+	reportFormats   []string
+	reportOutputDir string
 )
 
 var scanCmd = &cobra.Command{
@@ -33,6 +36,8 @@ func init() {
 	scanCmd.Flags().StringSliceVarP(&modules, "modules", "m", []string{"port_scan", "service_detection"}, "Modules to run")
 	scanCmd.Flags().IntVar(&timeout, "timeout", 300, "Scan timeout in seconds")
 	scanCmd.Flags().IntVar(&threads, "threads", 10, "Number of parallel threads")
+	scanCmd.Flags().StringSliceVar(&reportFormats, "output-format", []string{"html"}, "Report formats to generate (html, json, pdf)")
+	scanCmd.Flags().StringVar(&reportOutputDir, "output-dir", "reports", "Directory for generated reports")
 
 	scanCmd.MarkFlagRequired("targets")
 }
@@ -86,6 +91,25 @@ func executeScan(cmd *cobra.Command, args []string) error {
 		if err := db.GetDB().Create(&finding).Error; err != nil {
 			log.Errorf("failed to save finding: %v", err)
 		}
+	}
+
+	formats, err := report.ParseFormats(reportFormats)
+	if err != nil {
+		return fmt.Errorf("invalid report format: %w", err)
+	}
+	artifacts, err := report.Generate(report.Input{
+		Scan:     result.Scan,
+		Assets:   result.Assets,
+		Findings: result.Findings,
+	}, report.Options{
+		OutputDir: reportOutputDir,
+		Formats:   formats,
+	})
+	if err != nil {
+		return fmt.Errorf("generate reports: %w", err)
+	}
+	for _, artifact := range artifacts {
+		log.Infof("Generated %s report: %s", artifact.Format, artifact.Path)
 	}
 
 	// Print results

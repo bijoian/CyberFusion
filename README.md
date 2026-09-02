@@ -85,7 +85,24 @@ go build -o cyberfusion ./cmd/cyberfusion
 
 # Debug mode
 ./cyberfusion scan --targets example.com --debug
+
+# Generate JSON and PDF exports in a chosen directory
+./cyberfusion scan --targets example.com --output-format json,pdf --output-dir ./reports
 ```
+
+Each scan generates an HTML report in `reports/` by default. Select one or more
+formats with `--output-format` (`html`, `json`, or `pdf`). Files are named
+`cyberfusion-<scan-id>.<format>` and are created exclusively, so an existing
+report is never overwritten.
+
+### JSON Report Schema
+
+JSON exports use the versioned schema `cyberfusion.report/v1`. The top-level
+fields are `schema_version`, `scan`, `summary`, `assets`, and `findings`.
+`scan` contains identity, scope, timing, status, and metadata; `summary`
+contains risk and all severity counts; `assets` is the asset inventory; and
+each `findings` entry includes severity, CVE/CWE/CVSS data when available,
+evidence, sources, and remediation. Arrays are emitted as `[]` when empty.
 
 ### Docker
 
@@ -222,5 +239,4 @@ Built with inspiration from the Repertories :
 For issues and questions, please open a GitHub issue.
 
 ---
-
 
