@@ -28,5 +28,26 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CyberFusion specific
+.cyberfusion/
+*.db
+*.sqlite
+reports/
+results/
+scans/
+logs/
+.env.local
+credentials.json
+config.local.yaml
+
+# Build artifacts
+dist/
+build/
+bin/
