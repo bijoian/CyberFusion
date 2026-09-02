@@ -134,6 +134,48 @@ Collection endpoints support `limit` (1-100) and `offset`; findings can be
 filtered by `scan_id`, `asset_id`, `severity`, and `status`, while assets can be
 filtered by `scan_id`, `hostname`, `ip_address`, and `active`.
 
+### Control web frontend
+
+The self-contained React and TypeScript Control dashboard is in [`web/`](web/).
+It is a read-only client for the versioned API above: it does not create scans,
+store credentials, or alter the server's explicit target-authorization rules.
+
+```bash
+# Terminal 1: bind to all interfaces only when the API must be reached remotely.
+./cyberfusion server --listen-address 0.0.0.0:8080 --authorized-targets 192.168.1.0/24
+
+# Terminal 2
+cd web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+The Vite development server binds to `0.0.0.0` and listens on port `5173`, so a
+browser on the Kali VM can open `http://<host-address>:5173`. By default,
+`VITE_API_BASE_URL=/api/v1` and Vite forwards that path to
+`VITE_API_PROXY_TARGET=http://127.0.0.1:8080`; this keeps browser calls
+same-origin and avoids changing the API's authorization behavior.
+
+For a production bundle, run `npm run build` in `web/` and serve `web/dist`
+behind a reverse proxy that also forwards `/api/` to the Control API. Keep
+`VITE_API_BASE_URL` as `/api/v1` when building. `npm run preview` is available
+for local build verification and uses the same optional proxy setting.
+
+Set `VITE_DEMO_MODE=true` only for explicit local demonstrations. It displays a
+prominent demo banner and fixture data; it is never used if the real API is
+unavailable and must not be enabled for production deployments.
+
+#### Deployment and remote access
+
+For tablet or remote operator access, publish the dashboard only over a private,
+authenticated network such as a mesh VPN (for example, Tailscale) or an
+equivalent private access solution. Terminate HTTPS at its trusted certificate
+or reverse proxy, and keep the API behind that same private boundary. LAN-only
+HTTP can be acceptable for short-lived local development, but do not expose the
+Control dashboard, Control API, or scanner directly to the public internet.
+This frontend adds no VPN dependency and does not prescribe network settings.
+
 ### Docker
 
 ```bash
