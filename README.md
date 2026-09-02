@@ -154,13 +154,13 @@ docker run --rm cyberfusion scan --targets 192.168.1.1 --authorized-targets 192.
 - **Vulnerability detection** ✨ NEW
 - Finding correlation
 - Risk scoring (0-100)
-- HTML/JSON reporting
+- HTML/JSON/PDF reporting
+- Nuclei vulnerability scanning
 - SQLite database
 - CLI interface
 - GeoLocation support
 
 ### 🔄 In Progress
-- Nuclei integration
 - Full CVE database
 - Control REST API foundation
 
