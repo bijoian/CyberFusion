@@ -1,8 +1,8 @@
 # CyberFusion
 
-**Unified Security Scanning & Intelligence Platform**
+** Security Scanning & Intelligence Platform**
 
-CyberFusion is a comprehensive security scanning platform that fuses the best capabilities of multiple security tools (Nettacker, scan4all, and RapidScan) into a single, modular, and scalable framework.
+CyberFusion is a comprehensive security scanning platform that fuses the best capabilities of multiple security tools inspirada a single, modular, and scalable framework.
 
 ## 🎯 Vision
 
