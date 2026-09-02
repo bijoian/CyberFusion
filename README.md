@@ -223,4 +223,4 @@ For issues and questions, please open a GitHub issue.
 
 ---
 
-**Made with ❤️ by Copilot**
+
