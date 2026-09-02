@@ -1,9 +1,6 @@
 package nmap
 
 import (
-	"context"
-
-	"github.com/bijoian/cyberfusion/internal/domain"
 	"github.com/sirupsen/logrus"
 )
 
@@ -42,10 +39,4 @@ func (n *NmapAdapter) SupportsProtocol(protocol string) bool {
 		"icmp": true,
 	}
 	return protocols[protocol]
-}
-
-// Scan executes nmap scan - implemented in executor.go
-func (n *NmapAdapter) Scan(ctx context.Context, target string, options map[string]interface{}) ([]domain.Finding, error) {
-	// Implementation in executor.go
-	panic("implement me")
 }
